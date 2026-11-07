@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>灵梦工作台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%2312182A'/%3E%3Cpath%20d='M16%204L18.3%2013.7L28%2016L18.3%2018.3L16%2028L13.7%2018.3L4%2016L13.7%2013.7Z'%20fill='%23E7C27D'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="/static/style.css?v=20261105c" />
+</head>
+<body>
+<div id="dragbar" hidden style="display:none !important; pointer-events:none !important;"></div>
+<div class="app" id="app">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="side-top">
+      <div class="brand">
+        <div class="brand-row">
+          <span class="brand-mark">
+            <svg viewBox="0 0 32 32" width="15" height="15" aria-hidden="true"><path d="M16 3L19 13L29 16L19 19L16 29L13 19L3 16L13 13Z" fill="#E7C27D"/></svg>
+          </span>
+          <span class="brand-name">灵梦工作台</span>
+          <span class="brand-local" title="全部在本机运行">本地</span>
+        </div>
+        <div class="brand-tagline" title="寻找最优解，是灵梦的唯一直觉">寻找最优解，是灵梦的唯一直觉</div>
+      </div>
+      <button class="new-btn" id="newChatBtn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        新对话
+      </button>
+    </div>
+
+    <div class="conv-scroll" id="convList">
+      <div class="conv-empty" id="convEmpty">还没有对话</div>
+    </div>
+
+    <div class="side-foot">
+      <button class="foot-btn" id="settingsBtn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.63.7 1.1 1.35 1.1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        设置
+      </button>
+      <div class="foot-status" id="footStatus"><span id="modelStatus"><span id="statusIndicator"><i class="dot busy"></i> 🟢 服务已就绪（模型后台预热中...）</span></span></div>
+    </div>
+  </aside>
+
+  <!-- ============ 主区域 ============ -->
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn" id="sideToggle" title="收起 / 展开侧边栏">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+      </button>
+      <button class="icon-btn only-mobile" id="menuBtn" title="会话列表">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <div class="top-title" id="topTitle">新对话</div>
+      <div class="top-mode" id="topMode">通用对话</div>
+      <div class="top-spacer"></div>
+      <button class="split-btn toggle-panel-btn" id="splitToggleBtn" title="切换右侧成果预览舱">◫ 成果舱</button>
+      <button class="files-btn toggle-panel-btn" id="filesBtn" title="本对话已加载的文件">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21.4 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.2-9.19a4 4 0 0 1 5.65 5.66l-9.2 9.19a2 2 0 0 1-2.82-2.83l8.49-8.48"/></svg>
+        文件 <span class="files-count" id="filesCount">0</span>
+      </button>
+      <button class="icon-btn" id="delConvBtn" title="删除当前对话">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+      </button>
+      <div class="win-controls" id="winControls">
+        <button class="wc" data-act="min" title="最小化">─</button>
+        <button class="wc" data-act="max" title="最大化">▢</button>
+        <button class="wc" data-act="close" title="关闭">✕</button>
+      </div>
+    </header>
+
+    <div class="workbench workspace-body main-layout" id="workbench">
+      <div class="chat-pane main-chat-wrapper chat-area main-content" id="chatPane">
+        <div class="msg-scroll" id="msgScroll">
+      <div class="msg-inner" id="msgList"></div>
+      
+      <!-- Sibling 1: 欢迎页 (#welcome-view / #welcome) -->
+      <div id="welcome" class="welcome-alias" hidden style="display:none !important;" aria-hidden="true"></div>
+      <div class="welcome central-banner welcome-view" id="welcome-view" data-view="welcome-view">
+        <div class="welcome-inner">
+          <div class="welcome-header">
+            <div class="welcome-mark">
+              <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><path d="M16 3L19 13L29 16L19 19L16 29L13 19L3 16L13 13Z" fill="#E7C27D"/></svg>
+            </div>
+            <h1>今天想处理哪件事？</h1>
+            <p>全部在本机运行，文件不会离开这台电脑。</p>
+          </div>
+          <div class="welcome-dashboard welcome-layout">
+            <!-- 左侧主栏: 3 大核心业务流水线 + 2 个成果交付 -->
+            <div class="welcome-main-col">
+              <div class="cards dashboard-carousel" id="welcomeCards">
+                <!-- 第 1 排: 3 等分网格 -->
+                <div class="cards-grid cards-3">
+                  <button class="card card-hero task-card" data-mode="merge">
+                    <span class="card-icon-box merge">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563EB" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="8" height="16" rx="1.8"/>
+                        <line x1="5.8" y1="8" x2="8.2" y2="8"/>
+                        <line x1="5.8" y1="12" x2="8.2" y2="12"/>
+                        <rect x="13" y="4" width="8" height="16" rx="1.8"/>
+                        <line x1="15.8" y1="8" x2="18.2" y2="8"/>
+                        <line x1="15.8" y1="12" x2="18.2" y2="12"/>
+                        <path d="M8.5 16l2.2 2.2 4.8-4.8" stroke-width="2"/>
+                      </svg>
+                    </span>
+                    <span class="card-text">
+                      <b class="card-title">调拨对账汇总 <span class="badge-pill mini-badge">标准流水线</span></b>
+                      <span class="card-desc">两表关联对账、字段映射、差异验收单与真实 Excel 导出</span>
+                    </span>
+                  </button>
+                  <button class="card card-hero task-card" data-mode="price">
+                    <span class="card-icon-box price">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#D97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 20h18"/>
+                        <path d="M6 16v4"/>
+                        <path d="M11 11v9"/>
+                        <path d="M16 7v13"/>
+                        <path d="M6 12l5-5 5 3 5-6"/>
+                        <circle cx="21" cy="4" r="1.5" fill="#D97706"/>
+                      </svg>
+                    </span>
+                    <span class="card-text">
+                      <b class="card-title">供应商比选/比价</b>
+                      <span class="card-desc">多供应商报价横向对比、TCO 总成本测算与授标建议</span>
+                    </span>
+                  </button>
+                  <button class="card card-hero task-card" data-mode="review">
+                    <span class="card-icon-box review">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                      </svg>
+                    </span>
+                    <span class="card-text">
+                      <b class="card-title">合规性审查</b>
+                      <span class="card-desc">支持合同、采购寻源流程、招投标文件、报销与供应商准入合规审查</span>
+                    </span>
+                  </button>
+                </div>
+                <!-- 第 2 排: 2 等分网格 (各占 50% 宽度，左右边缘垂直对齐) -->
+                <div class="cards-grid cards-2">
+                  <button class="card card-hero output-card" data-mode="report">
+                    <span class="card-icon-box report">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19V5a2 2 0 0 1 2-2h8l4 4v2"/>
+                        <path d="M8 7h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/>
+                        <line x1="11" y1="12" x2="14" y2="12"/>
+                        <line x1="11" y1="16" x2="14" y2="16"/>
+                        <path d="M16 2.5l3.5 3.5L14 11.5l-3.5.5.5-3.5L16 2.5z"/>
+                      </svg>
+                    </span>
+                    <span class="card-text">
+                      <b class="card-title">写专业报告（短/长报告）</b>
+                      <span class="card-desc">金字塔结构、归因分析、分章节长报告接力深度撰写</span>
+                    </span>
+                  </button>
+                  <button class="card card-hero output-card" data-mode="ppt">
+                    <span class="card-icon-box ppt">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#E11D48" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                        <path d="M7 13v-3"/>
+                        <path d="M12 13V8"/>
+                        <path d="M17 13v-5"/>
+                      </svg>
+                    </span>
+                    <span class="card-text">
+                      <b class="card-title">生成演示 PPT</b>
+                      <span class="card-desc">大纲策划、原生 Office 图表、演讲者备注与母版导出</span>
+                    </span>
+                  </button>
+                </div>
+                <!-- 第 3 排: 全宽横向上手指南条形卡片 (Horizontal Step Bar) -->
+                <div class="welcome-step-bar wsc-guide-horizontal wsc-guide-section" id="welcomeStepBar">
+                  <div class="wsb-header wsc-guide-title">
+                    <span class="wsb-icon wsc-guide-icon">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </span>
+                    <b>快速上手指南</b>
+                  </div>
+                  <div class="wsb-steps wsc-steps">
+                    <div class="wsb-step wsc-step">
+                      <span class="wsb-step-idx wsc-step-idx">1</span>
+                      <div class="wsb-step-info wsc-step-info">
+                        <b>选定业务流水线或拖拽表格</b>
+                        <span>点击上方 3 大业务卡片，或直接拖拽表格到窗口</span>
+                      </div>
+                    </div>
+                    <div class="wsb-arrow">➔</div>
+                    <div class="wsb-step wsc-step">
+                      <span class="wsb-step-idx wsc-step-idx">2</span>
+                      <div class="wsb-step-info wsc-step-info">
+                        <b>字段映射与基准参数配置</b>
+                        <span>智能识别表头，配置统一税率与贴息参数</span>
+                      </div>
+                    </div>
+                    <div class="wsb-arrow">➔</div>
+                    <div class="wsb-step wsc-step">
+                      <span class="wsb-step-idx wsc-step-idx">3</span>
+                      <div class="wsb-step-info wsc-step-info">
+                        <b>验收级核查与一键交付</b>
+                        <span>Python 确定性计算，0口算幻觉，导出 Excel / PPT</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 右侧并列看板卡片: 📌 最近报表与校验记录（本机存根，100% 垂直等高） -->
+            <div class="welcome-side-col">
+              <div class="welcome-side-card" id="welcomeSideCard">
+                <div class="wsc-header">
+                  <div class="wsc-title">
+                    <span class="wsc-icon">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#B38634" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-2l-2-2V5a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v8l-2 2v2z"/></svg>
+                    </span>
+                    <b>最近报表与校验记录</b>
+                  </div>
+                  <span class="wsc-badge">本机存根</span>
+                </div>
+
+                <div class="wsc-recent-list" id="wscRecentList">
+                  <div class="wsc-item" data-action="quick-merge" title="点击直接启动物资调拨对账流水线">
+                    <div class="wsc-item-icon merge">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/><path d="M8 12h2M14 12h2"/></svg>
+                    </div>
+                    <div class="wsc-item-body">
+                      <div class="wsc-item-title">《物资调拨对账校验汇总表.xlsx》</div>
+                      <div class="wsc-item-sub">账实相符校验 · 自动汇总差额存根</div>
+                    </div>
+                    <span class="wsc-tag green">已就绪</span>
+                  </div>
+                  <div class="wsc-item" data-action="quick-price" title="点击直接启动供应商比选/比价流水线">
+                    <div class="wsc-item-icon price">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#D97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 16v4"/><path d="M11 11v9"/><path d="M16 7v13"/></svg>
+                    </div>
+                    <div class="wsc-item-body">
+                      <div class="wsc-item-title">《材料比价与TCO成本分析表.xlsx》</div>
+                      <div class="wsc-item-sub">4D加权评分 · 综合最低TCO测算</div>
+                    </div>
+                    <span class="wsc-tag blue">已就绪</span>
+                  </div>
+                  <div class="wsc-item" data-action="quick-review" title="点击直接启动合规性审查流水线">
+                    <div class="wsc-item-icon review">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                    </div>
+                    <div class="wsc-item-body">
+                      <div class="wsc-item-title">《合规性审查与风控评级报告.docx》</div>
+                      <div class="wsc-item-sub">核心合规标准 · 强弱视觉对比排查</div>
+                    </div>
+                    <span class="wsc-tag gold">已就绪</span>
+                  </div>
+                </div>
+
+                <div class="wsc-footer">
+                  <span class="wsc-secure-dot"></span>
+                  <span>本机离线计算 · 数据不出电脑 · 严密物理隔离</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sibling 2: 四步任务面板容器 #task-wizard-view -->
+      <div id="task-wizard-view" class="task-wizard-view-container pipeline-container" hidden>
+        <!-- ============ 物资调拨对账汇总 4 步标准流水线面板 ============ -->
+        <div class="pipeline-panel standalone-view" id="reconcilePipeline" data-panel="对账汇总-panel" hidden>
+          <div id="对账汇总-panel" class="standalone-panel-alias" hidden style="display:none !important;" aria-hidden="true"></div>
+          <div class="pipeline-card wizard-card pipeline-container">
+            <div class="pipeline-header">
+              <div class="pipeline-title-group">
+                <span class="pipeline-badge">标准业务流水线</span>
+                <h2>物资调拨对账汇总</h2>
+                <p>支持调拨表与对账单跨表关联、字段智能映射、确定性合计与差额校验验收单，一键交付专业 Excel 成果</p>
+              </div>
+            <button class="icon-btn pipeline-close-btn" id="pipelineCloseBtn" title="退回首页">✕</button>
+          </div>
+
+          <!-- 4 步进度指示条 -->
+          <div class="pipeline-stepper" id="pipelineStepper">
+            <div class="step-item active" data-step="1">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <span class="step-title">上传文件</span>
+                <span class="step-desc">调拨表与对账清单</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="2">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <span class="step-title">字段映射确认</span>
+                <span class="step-desc">表头匹配与确认</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="3">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <span class="step-title">预检与验收单</span>
+                <span class="step-desc">账实核对与差额诊断</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="4">
+              <div class="step-num">4</div>
+              <div class="step-text">
+                <span class="step-title">一键交付</span>
+                <span class="step-desc">导出 Excel / 报告 / PPT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1 容器: 上传文件 -->
+          <div class="pipeline-step-body" id="pipelineStep1">
+            <div class="step-instruction">
+              <h3>第 1 步：上传调拨表与对账清单 Excel</h3>
+              <p>请上传待核验的业务表格（如《调拨汇总样表.xlsx》与《对账清单.xlsx》，支持 .xlsx / .xls / .csv 格式）。</p>
+            </div>
+            <div class="pipeline-dropzone" id="pipelineDropzone">
+              <div class="dropzone-icon">📁</div>
+              <div class="dropzone-text">
+                <b>点击选择文件 或 直接拖拽文件到这里</b>
+                <span>支持同时上传调拨汇总表与对账清单，系统将自动进行多表关联</span>
+              </div>
+              <input type="file" id="pipelineFileInput" multiple accept=".xlsx,.xls,.csv" hidden />
+            </div>
+            <div class="pipeline-files-list" id="pipelineFilesList"></div>
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="pipelineStep1ResetBtn">清空已选</button>
+              <button class="apple-btn primary" id="pipelineStep1NextBtn" disabled>下一步：确认字段映射 →</button>
+            </div>
+          </div>
+
+          <!-- Step 2 容器: 字段映射确认与微调 -->
+          <div class="pipeline-step-body" id="pipelineStep2" hidden>
+            <div class="step-instruction">
+              <h3>第 2 步：核心业务字段映射确认</h3>
+              <p>系统已自动读取表格表头，并智能推断出推荐映射。请核对并确认各核心字段的归属：</p>
+            </div>
+
+            <!-- 表头智能识别与微调通知栏 -->
+            <div class="reconcile-header-bar" id="reconcileHeaderBar">
+              <div class="rhb-info">
+                <span class="rhb-badge">智能扫描</span>
+                <span>已自动扫描表格前 15 行，识别第 <b id="reconcileDetectedRow">1</b> 行为表头（如识别不准，可微调切换第 1~10 行）</span>
+              </div>
+              <div class="rhb-controls">
+                <label for="reconcileHeaderRowSelect">微调表头行：</label>
+                <select id="reconcileHeaderRowSelect" class="apple-select mini">
+                  <option value="1">第 1 行</option>
+                  <option value="2">第 2 行</option>
+                  <option value="3">第 3 行</option>
+                  <option value="4">第 4 行</option>
+                  <option value="5">第 5 行</option>
+                  <option value="6">第 6 行</option>
+                  <option value="7">第 7 行</option>
+                  <option value="8">第 8 行</option>
+                  <option value="9">第 9 行</option>
+                  <option value="10">第 10 行</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mapping-grid" id="mappingGrid">
+              <!-- 动态生成的 6 个映射卡片: 物资名称 / 规格型号 / 数量 / 调出方 / 调入方 / 日期 -->
+            </div>
+
+            <!-- 自定义核对列与匹配规则配置 -->
+            <div class="reconcile-custom-rules-section" id="reconcileCustomRulesSection">
+              <div class="rcrs-header">
+                <div class="rcrs-title">
+                  <b>自定义核对列与匹配规则</b>
+                  <span>支持添加自定义比对列与校验规则（如：文本一致、数值相等、允许误差范围 ±X、调出>=实收、比例偏离）</span>
+                </div>
+                <button type="button" class="apple-btn mini secondary" id="addReconcileCustomRuleBtn">+ 添加自定义核对列/关联键</button>
+              </div>
+              <div class="rcrs-list" id="reconcileCustomRulesList"></div>
+            </div>
+
+            <div class="mapping-preview-box" id="mappingPreviewBox">
+              <span class="mp-label">💡 数据提示：</span>
+              <span class="mp-content" id="mappingPreviewContent">两表将以【物资名称】及【规格型号】作为关联主键对齐并计算差额。</span>
+            </div>
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="pipelineStep2BackBtn">← 上一步</button>
+              <button class="apple-btn primary" id="pipelineStep2NextBtn">下一步：预检并生成验收核对单 →</button>
+            </div>
+          </div>
+
+          <!-- Step 3 容器: 预检与验收核对单 (核心验收环节) -->
+          <div class="pipeline-step-body" id="pipelineStep3" hidden>
+            <div class="step-instruction">
+              <div class="step-ins-row">
+                <div>
+                  <h3>第 3 步：数据校验验收单（核心验收环节）</h3>
+                  <p>由本地 Python 确定性计算引擎自动执行合计核算与账实对账，结果绝对权威无口算幻觉：</p>
+                </div>
+                <button class="apple-btn mini" id="pipelineStep3RecheckBtn">🔄 重新核算</button>
+              </div>
+            </div>
+
+            <!-- 数据校验验收单卡片主体 -->
+            <div class="audit-sheet" id="auditSheetContainer">
+              <div class="audit-sheet-header">
+                <div class="ash-badge">权威核验存根</div>
+                <h4>《数据校验验收单》（物资调拨 vs 财务对账）</h4>
+                <div class="ash-meta" id="auditSheetMeta">-</div>
+              </div>
+
+              <!-- 统计口径说明 -->
+              <div class="audit-scope-box">
+                <div class="asb-icon">📌</div>
+                <div class="asb-text">
+                  <b>统计口径说明：</b>
+                  <span id="auditScopeText">以【物资名称】与【规格型号】作为唯一主键进行双向跨表对齐，差额公式为 <code>差额 = 账面数量 - 实际调拨量</code>。|差额| ≤ 0.001 判定为账实相符，否则判定为异常差额。</span>
+                </div>
+              </div>
+
+              <!-- 验收核心指标卡片 -->
+              <div class="audit-kpi-bar" id="auditKpiBar"></div>
+
+              <!-- 强弱视觉对比呈现容器 -->
+              <div class="reconcile-contrast-container" id="reconcileContrastContainer">
+                <!-- 1. 重点差异与异常项（强视觉高亮置顶） -->
+                <div class="reconcile-highlight-section" id="reconcileHighlightSection">
+                  <div class="rhs-head">
+                    <div class="rhs-title-box">
+                      <span class="rhs-badge">重点核查</span>
+                      <b class="rhs-title">异常与差额清单（强视觉高亮）</b>
+                    </div>
+                    <span class="rhs-count" id="reconcileHighlightCount">0 笔</span>
+                  </div>
+                  <div class="rhs-body" id="reconcileHighlightBody">
+                    <!-- 动态渲染差异项卡片 -->
+                  </div>
+                </div>
+
+                <!-- 2. 完全符合项（弱视觉弱化紧凑折叠） -->
+                <div class="reconcile-weak-section" id="reconcileWeakSection">
+                  <div class="rws-head" id="reconcileWeakToggleHead" title="点击展开/折叠">
+                    <div class="rws-title-box">
+                      <span class="rws-badge">核验通过</span>
+                      <b>完全账实相符项（弱视觉弱化）</b>
+                      <span class="rws-count" id="reconcileWeakCount">0 笔</span>
+                    </div>
+                    <span class="rws-toggle-hint" id="reconcileWeakArrow">▼ 点击折叠</span>
+                  </div>
+                  <div class="rws-body" id="reconcileWeakBody">
+                    <!-- 动态渲染相符项紧凑清单 -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- 校验通过项明细 -->
+              <div class="audit-section audit-passed-section">
+                <div class="as-head success">
+                  <span class="as-icon">✅</span>
+                  <b id="auditPassedTitle">校验通过项（账实相符 0 笔）</b>
+                </div>
+                <div class="as-table-wrap" id="auditPassedTableWrap"></div>
+              </div>
+
+              <!-- 差异/异常清单明细 -->
+              <div class="audit-section audit-discrepancy-section">
+                <div class="as-head warning">
+                  <span class="as-icon">⚠️</span>
+                  <b id="auditDiscrepancyTitle">差异/异常清单（差额 0 笔、缺失值 0 处）</b>
+                </div>
+                <div class="as-table-wrap" id="auditDiscrepancyTableWrap"></div>
+              </div>
+            </div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="pipelineStep3BackBtn">← 调整字段映射</button>
+              <button class="apple-btn primary" id="pipelineStep3NextBtn">下一步：一键交付成果 →</button>
+            </div>
+          </div>
+
+          <!-- Step 4 容器: 一键交付 -->
+          <div class="pipeline-step-body" id="pipelineStep4" hidden>
+            <div class="step-instruction">
+              <h3>第 4 步：成果交付与多场景协同流转</h3>
+              <p>对账核算已完成！您可以直接导出标准 Excel 汇总表，或将验收结果一键送入专业报告/PPT 流水线：</p>
+            </div>
+
+            <div class="delivery-grid">
+              <!-- 卡片 1: 直接导出 Excel -->
+              <div class="delivery-card primary-card">
+                <div class="dc-icon">📊</div>
+                <div class="dc-info">
+                  <h4>导出标准《对账汇总表.xlsx》</h4>
+                  <p>生成含专业表头、自适应列宽、求和样式与对账备注的官方交付级 Excel 文件，支持本地直接打开。</p>
+                </div>
+                <button class="apple-btn primary lg" id="pipelineExportExcelBtn">📥 立即导出 Excel 汇总表</button>
+              </div>
+
+              <!-- 卡片 2: 送入专业报告 -->
+              <div class="delivery-card">
+                <div class="dc-icon">📝</div>
+                <div class="dc-info">
+                  <h4>一键送入「写专业报告」</h4>
+                  <p>将上述《数据校验验收单》核对结果及差异清单带入金字塔报告引擎，分条剖析管理根因并输出措施。</p>
+                </div>
+                <button class="apple-btn secondary lg" id="pipelineToReportBtn">送入写专业报告 →</button>
+              </div>
+
+              <!-- 卡片 3: 送入带图表的 PPT -->
+              <div class="delivery-card">
+                <div class="dc-icon">📑</div>
+                <div class="dc-info">
+                  <h4>一键送入「生成演示 PPT」</h4>
+                  <p>将对账实收数据与计划数据转换为原生柱状/折线图表幻灯片与高管汇报大纲，支持演讲者备注。</p>
+                </div>
+                <button class="apple-btn secondary lg" id="pipelineToPptBtn">送入生成演示 PPT →</button>
+              </div>
+            </div>
+
+            <!-- 导出的成果卡片容器（导出后在此展示） -->
+            <div class="pipeline-export-result" id="pipelineExportResult" hidden></div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="pipelineStep4BackBtn">← 查看验收核对单</button>
+              <button class="apple-btn" id="pipelineFinishBtn">完成并返回对话</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============ 供应商比选/比价 4 步标准流水线面板 ============ -->
+      <div class="pipeline-panel standalone-view" id="pricePipeline" data-panel="比选比价-panel" hidden>
+        <div id="比选比价-panel" class="standalone-panel-alias" hidden style="display:none !important;" aria-hidden="true"></div>
+        <div class="pipeline-card wizard-card pipeline-container">
+          <div class="pipeline-header">
+            <div class="pipeline-title-group">
+              <span class="pipeline-badge">标准业务流水线</span>
+              <h2>供应商比选 / 材料比价</h2>
+              <p>支持多供应商报价横向对比、确定性 TCO 模型折算、加权综合评分与压价谈判策略，一键交付专业 Excel/PPT 成果</p>
+            </div>
+            <button class="icon-btn pipeline-close-btn" id="pricePipelineCloseBtn" title="退回首页">✕</button>
+          </div>
+
+          <!-- 4 步进度指示条 -->
+          <div class="pipeline-stepper" id="pricePipelineStepper">
+            <div class="step-item active" data-step="1">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <span class="step-title">上传报价单</span>
+                <span class="step-desc">各供应商报价表格</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="2">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <span class="step-title">参数与权重配置</span>
+                <span class="step-desc">基准税率与四维权重</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="3">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <span class="step-title">比价校验表</span>
+                <span class="step-desc">确定性 TCO 与评分</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="4">
+              <div class="step-num">4</div>
+              <div class="step-text">
+                <span class="step-title">一键交付</span>
+                <span class="step-desc">导出 Excel / 图表 PPT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1: 上传报价表 -->
+          <div class="pipeline-step-body" id="pricePipelineStep1">
+            <div class="step-instruction">
+              <h3>第 1 步：上传各供应商材料报价表格</h3>
+              <p>支持同时上传多家供应商的报价单或合并报价表（支持 .xlsx / .xls / .csv 格式），系统将自动识别品名、单价、交期及账期条件。</p>
+            </div>
+            <div class="pipeline-dropzone" id="pricePipelineDropzone">
+              <div class="dropzone-icon">💰</div>
+              <div class="dropzone-text">
+                <b>点击选择文件 或 直接拖拽各供应商报价单到这里</b>
+                <span>支持多个供应商报价明细表合并横向比对</span>
+              </div>
+              <input type="file" id="pricePipelineFileInput" multiple accept=".xlsx,.xls,.csv" hidden />
+            </div>
+            <div class="pipeline-files-list" id="pricePipelineFilesList"></div>
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="pricePipelineStep1ResetBtn">清空已选</button>
+              <button class="apple-btn primary" id="pricePipelineStep1NextBtn" disabled>下一步：配置评分权重与税率 →</button>
+            </div>
+          </div>
+
+          <!-- Step 2: 参数配置 -->
+          <div class="pipeline-step-body" id="pricePipelineStep2" hidden>
+            <div class="step-instruction">
+              <h3>第 2 步：比选参数与评分权重配置</h3>
+              <p>请按采购项目策略调整各维度评分权重（滑块实时生效）及统一核算基准税率：</p>
+            </div>
+            <div class="params-config-grid">
+              <div class="param-card">
+                <div class="pc-head">
+                  <span class="pc-title">价格得分权重 (Price)</span>
+                  <span class="pc-val" id="echoWeightPrice">40%</span>
+                </div>
+                <input type="range" class="slider-weight" id="sliderWeightPrice" min="0" max="100" value="40" step="5" />
+                <div class="pc-desc">基于综合 TCO 单价进行横向最优比选（最低价得满分）</div>
+              </div>
+              <div class="param-card">
+                <div class="pc-head">
+                  <span class="pc-title">供货交期权重 (Delivery)</span>
+                  <span class="pc-val" id="echoWeightDelivery">20%</span>
+                </div>
+                <input type="range" class="slider-weight" id="sliderWeightDelivery" min="0" max="100" value="20" step="5" />
+                <div class="pc-desc">基于交货天数考核保供时效，现货即发得满分</div>
+              </div>
+              <div class="param-card">
+                <div class="pc-head">
+                  <span class="pc-title">账期与付款条件 (Payment)</span>
+                  <span class="pc-val" id="echoWeightPayment">20%</span>
+                </div>
+                <input type="range" class="slider-weight" id="sliderWeightPayment" min="0" max="100" value="20" step="5" />
+                <div class="pc-desc">月结60天以上得高分，折现计算营运资金贴息收益</div>
+              </div>
+              <div class="param-card">
+                <div class="pc-head">
+                  <span class="pc-title">质量与履约风险 (Quality & Risk)</span>
+                  <span class="pc-val" id="echoWeightQuality">20%</span>
+                </div>
+                <input type="range" class="slider-weight" id="sliderWeightQuality" min="0" max="100" value="20" step="5" />
+                <div class="pc-desc">排查漏填交期、漏填运费等待核实风险项扣分</div>
+              </div>
+            </div>
+
+            <div class="tax-config-row">
+              <div class="tcr-item">
+                <label>统一基准税率：</label>
+                <select class="sel" id="selectTaxRate">
+                  <option value="0.13" selected>13% 增值税专用发票（建筑工程/工业标品标准）</option>
+                  <option value="0.09">9% 增值税专用发票（交通运输/建筑安装）</option>
+                  <option value="0.06">6% 增值税专用发票（现代物流技术服务）</option>
+                  <option value="0.00">0% 不含税 / 免税</option>
+                </select>
+              </div>
+              <div class="tcr-item">
+                <label>资金贴息年化利率：</label>
+                <select class="sel" id="selectInterestRate">
+                  <option value="0.06" selected>6% / 年（企业基准营运资金成本）</option>
+                  <option value="0.08">8% / 年（高成本短期周转资金）</option>
+                  <option value="0.04">4% / 年（央国企低成本集中授信）</option>
+                </select>
+              </div>
+              <div class="weight-total-status" id="weightTotalStatus">
+                <span>当前权重总和：<b>100%</b>（有效）</span>
+              </div>
+            </div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="pricePipelineStep2BackBtn">← 上一步</button>
+              <button class="apple-btn primary" id="pricePipelineStep2NextBtn">下一步：测算确定性 TCO 与比价校验表 →</button>
+            </div>
+          </div>
+
+          <!-- Step 3: 比价校验表 -->
+          <div class="pipeline-step-body" id="pricePipelineStep3" hidden>
+            <div class="step-instruction">
+              <div class="step-ins-row">
+                <div>
+                  <h3>第 3 步：《比价校验表》（确定性 TCO 与加权评估报告）</h3>
+                  <p>由本地 Python 确定性计算引擎自动执行统一税率换算、账期贴息折算、差价率标注与待核实项排查：</p>
+                </div>
+                <button class="apple-btn mini" id="pricePipelineStep3RecheckBtn">🔄 重新测算</button>
+              </div>
+            </div>
+
+            <div class="audit-sheet" id="priceAuditSheetContainer">
+              <div class="audit-sheet-header">
+                <div class="ash-badge">TCO 测算存根</div>
+                <h4>《材料比价与确定性 TCO 成本测算校验表》</h4>
+                <div class="ash-meta" id="priceAuditSheetMeta">-</div>
+              </div>
+
+              <div class="audit-scope-box">
+                <div class="asb-icon">📌</div>
+                <div class="asb-text">
+                  <b>测算模型说明：</b>
+                  <span id="priceAuditScopeText">统一按 13% 增值税换算未税单价与含税单价；`综合 TCO 单价 = 含税单价 - 账期资金贴息收益 + 运费调整`；自动标出同品种最低报价及溢价率。</span>
+                </div>
+              </div>
+
+              <!-- 核心比选指标卡片 -->
+              <div class="audit-kpi-bar" id="priceAuditKpiBar"></div>
+
+              <!-- 比价校验表主体 -->
+              <div class="audit-section">
+                <div class="as-head primary">
+                  <span class="as-icon">📋</span>
+                  <b>横向比价校验表（含税/未税单价、账期贴息与综合 TCO）</b>
+                </div>
+                <div class="as-table-wrap" id="priceComparisonTableWrap"></div>
+              </div>
+
+              <!-- 加权得分矩阵与授标推荐 -->
+              <div class="audit-section">
+                <div class="as-head success">
+                  <span class="as-icon">🏆</span>
+                  <b>加权评分矩阵与授标推荐结论（4B 模型依据此矩阵定点压价）</b>
+                </div>
+                <div class="as-table-wrap" id="priceScoreMatrixTableWrap"></div>
+              </div>
+
+              <!-- 待核实项清单 -->
+              <div class="audit-section">
+                <div class="as-head warning">
+                  <span class="as-icon">⚠️</span>
+                  <b id="priceVerificationTitle">待核实项清单（漏填交期/运费排查）</b>
+                </div>
+                <div class="as-table-wrap" id="priceVerificationTableWrap"></div>
+              </div>
+            </div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="pricePipelineStep3BackBtn">← 调整权重与参数</button>
+              <button class="apple-btn primary" id="pricePipelineStep3NextBtn">下一步：一键交付成果 →</button>
+            </div>
+          </div>
+
+          <!-- Step 4: 一键交付 -->
+          <div class="pipeline-step-body" id="pricePipelineStep4" hidden>
+            <div class="step-instruction">
+              <h3>第 4 步：成果交付与多场景协同流转</h3>
+              <p>比选计算已完成！您可以直接导出标准 Excel 比价表、含原生柱状图的汇报 PPT，或将比选矩阵送入谈判报告：</p>
+            </div>
+
+            <div class="delivery-grid">
+              <!-- 卡片 1: 导出 Excel -->
+              <div class="delivery-card primary-card">
+                <div class="dc-icon">📊</div>
+                <div class="dc-info">
+                  <h4>导出《材料比价与TCO成本分析表.xlsx》</h4>
+                  <p>包含双 Sheet（材料明细比价校验表 + 加权评分矩阵），标出最低价、千分位数值格式及待核实高亮。</p>
+                </div>
+                <button class="apple-btn primary lg" id="priceExportExcelBtn">📥 立即导出 Excel 比价表</button>
+              </div>
+
+              <!-- 卡片 2: 导出含柱状图 PPT -->
+              <div class="delivery-card">
+                <div class="dc-icon">📈</div>
+                <div class="dc-info">
+                  <h4>导出《供应商比选汇报PPT.pptx》</h4>
+                  <p>包含原生 Office 可编辑柱状图（Column Clustered）、核心 KPI 统计卡片、授标推荐表与分供应商谈判要点。</p>
+                </div>
+                <button class="apple-btn secondary lg" id="priceExportPptBtn">📊 立即导出柱状图 PPT</button>
+              </div>
+
+              <!-- 卡片 3: 送入写专业报告 -->
+              <div class="delivery-card">
+                <div class="dc-icon">📝</div>
+                <div class="dc-info">
+                  <h4>一键送入「写专业报告」</h4>
+                  <p>将上述加权得分矩阵与分供应商谈判压价要点送入 4B 模型，输出深度采购定标与谈判策划专项报告。</p>
+                </div>
+                <button class="apple-btn secondary lg" id="priceToReportBtn">送入写专业报告 →</button>
+              </div>
+            </div>
+
+            <div class="pipeline-export-result" id="priceExportResult" hidden></div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="pricePipelineStep4BackBtn">← 查看比价校验表</button>
+              <button class="apple-btn" id="pricePipelineFinishBtn">完成并返回对话</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============ 合规性审查 4 步标准流水线面板 ============ -->
+      <div class="pipeline-panel standalone-view" id="reviewPipeline" data-panel="合同审查-panel" hidden>
+        <div id="合同审查-panel" class="standalone-panel-alias" hidden style="display:none !important;" aria-hidden="true"></div>
+        <div class="pipeline-card wizard-card pipeline-container">
+          <div class="pipeline-header">
+            <div class="pipeline-title-group">
+              <span class="pipeline-badge">标准业务流水线</span>
+              <h2>合规性审查</h2>
+              <p>支持合同、采购寻源流程、招投标文件、报销与供应商准入合规审查，逐条自定义标准，强弱视觉对比排查，一键导出专业报告/PPT</p>
+            </div>
+            <button class="icon-btn pipeline-close-btn" id="reviewPipelineCloseBtn" title="退回首页">✕</button>
+          </div>
+
+          <!-- 4 步进度指示条 -->
+          <div class="pipeline-stepper" id="reviewPipelineStepper">
+            <div class="step-item active" data-step="1">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <span class="step-title">上传文件/文本</span>
+                <span class="step-desc">合同/招投标/制度材料</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="2">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <span class="step-title">审查标准确认</span>
+                <span class="step-desc">内置开关与逐条自定义</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="3">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <span class="step-title">合规审查验收单</span>
+                <span class="step-desc">强弱视觉对比排查</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="4">
+              <div class="step-num">4</div>
+              <div class="step-text">
+                <span class="step-title">一键交付</span>
+                <span class="step-desc">导出 Word / 汇报 PPT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1: 上传审查文件或直接粘贴 -->
+          <div class="pipeline-step-body" id="reviewPipelineStep1">
+            <div class="step-instruction">
+              <h3>第 1 步：上传审查文件或直接粘贴文本</h3>
+              <p>支持 Word (.docx) / PDF (.pdf) / 文本 (.txt) 文件，也可以直接在下方输入框中粘贴合同或制度条款草案正文：</p>
+            </div>
+            <div class="pipeline-dropzone" id="reviewPipelineDropzone">
+              <div class="dropzone-icon">📄</div>
+              <div class="dropzone-text">
+                <b>点击选择文件 或 直接拖拽审查文件到这里</b>
+                <span>支持合同、寻源、招投标、报销、供应商准入等 .docx / .pdf / .txt 文件</span>
+              </div>
+              <input type="file" id="reviewPipelineFileInput" accept=".docx,.pdf,.txt" hidden />
+            </div>
+            <div class="pipeline-files-list" id="reviewPipelineFilesList"></div>
+
+            <div class="direct-text-box">
+              <div class="dt-head">或直接粘贴待审查条款与制度文本：</div>
+              <textarea id="reviewContractTextarea" rows="6" placeholder="在此粘贴待审查条款或制度文本（如付款条款、验收资质、质保、廉洁、报销与准入要求）..."></textarea>
+            </div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="reviewPipelineStep1ResetBtn">清空内容</button>
+              <button class="apple-btn primary" id="reviewPipelineStep1NextBtn">下一步：确认合规审查标准 →</button>
+            </div>
+          </div>
+
+          <!-- Step 2: 审查规则确认与逐条自定义审查标准编辑器 -->
+          <div class="pipeline-step-body" id="reviewPipelineStep2" hidden>
+            <div class="step-instruction">
+              <h3>第 2 步：合规审查标准配置（逐条自定义审查标准编辑器）</h3>
+              <p>系统已就绪专业合规审查规则库。您可随时一键关闭系统内置标准，完全按自己的自定义规则进行审查：</p>
+            </div>
+
+            <!-- 内置标准开关栏 -->
+            <div class="builtin-rules-bar">
+              <label class="builtin-switch-label">
+                <input type="checkbox" id="toggleBuiltinRulesCheckbox" checked />
+                <span class="bs-text">🔘 启用系统内置合规标准（共 6 条，可单独勾选/取消）</span>
+              </label>
+              <button class="apple-btn mini secondary" id="toggleBuiltinListBtn" type="button">收起/展开内置标准明细</button>
+            </div>
+
+            <div class="builtin-rules-wrap" id="builtinRulesWrap">
+              <div class="review-rules-grid">
+                <div class="rule-card">
+                  <div class="rc-check"><input type="checkbox" class="builtin-clause-cb" data-clause="0" checked /></div>
+                  <div class="rc-icon">💳</div>
+                  <div class="rc-body">
+                    <h4>① 付款节点与账期</h4>
+                    <p>重点排查「背靠背付款」陷阱、超额预付款（>50%）、未明确以验收合格报告为准、增值税专票税率缺失及质保金退还时限。</p>
+                  </div>
+                </div>
+                <div class="rule-card">
+                  <div class="rc-check"><input type="checkbox" class="builtin-clause-cb" data-clause="1" checked /></div>
+                  <div class="rc-icon">⚖️</div>
+                  <div class="rc-body">
+                    <h4>② 延期交货违约金对等性</h4>
+                    <p>重点排查日超3‰过高滞纳金、单方不可撤销免责解约特权、双方责任不对等及违约金封顶上限（5%~10%）。</p>
+                  </div>
+                </div>
+                <div class="rule-card">
+                  <div class="rc-check"><input type="checkbox" class="builtin-clause-cb" data-clause="2" checked /></div>
+                  <div class="rc-icon">🔍</div>
+                  <div class="rc-body">
+                    <h4>③ 质量验收标准与异议期</h4>
+                    <p>重点排查超短检验异议期（少于72小时默认合格）、非法排除隐蔽瑕疵追偿权、国标/技术协议依据及复检费用承担。</p>
+                  </div>
+                </div>
+                <div class="rule-card">
+                  <div class="rc-check"><input type="checkbox" class="builtin-clause-cb" data-clause="3" checked /></div>
+                  <div class="rc-icon">🛡️</div>
+                  <div class="rc-body">
+                    <h4>④ 知识产权归属</h4>
+                    <p>重点排查买方原有图纸与定制成果失权漏洞、第三方知识产权侵权免责陷阱及权利瑕疵担保抗辩赔偿条款。</p>
+                  </div>
+                </div>
+                <div class="rule-card">
+                  <div class="rc-check"><input type="checkbox" class="builtin-clause-cb" data-clause="4" checked /></div>
+                  <div class="rc-icon">🔒</div>
+                  <div class="rc-body">
+                    <h4>⑤ 保密义务</h4>
+                    <p>重点排查单方保密不平等条款、保密期限过短（随合同终止失效漏洞）及商业秘密泄密违约金责任。</p>
+                  </div>
+                </div>
+                <div class="rule-card">
+                  <div class="rc-check"><input type="checkbox" class="builtin-clause-cb" data-clause="5" checked /></div>
+                  <div class="rc-icon">🏛️</div>
+                  <div class="rc-body">
+                    <h4>⑥ 争议解决与管辖法院</h4>
+                    <p>重点排查供方外地管辖壁垒、单方剥夺买方诉讼权利、诉讼与仲裁冲突约定及明确买方所在地管辖便利。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 宽敞的大尺寸逐条自定义输入区 -->
+            <div class="custom-rules-section">
+              <div class="crs-header">
+                <div class="crs-title-box">
+                  <span class="crs-icon">✏️</span>
+                  <div>
+                    <b>大尺寸逐条自定义审查标准编辑器</b>
+                    <span class="crs-sub">针对特定业务、海外供应商准入、采购寻源流程或招投标的独立合规审查项</span>
+                  </div>
+                </div>
+                <div class="crs-actions">
+                  <button class="apple-btn mini secondary" id="saveCustomRulesTemplateBtn" type="button">💾 保存为我的常用审查模板</button>
+                  <button class="apple-btn mini secondary" id="loadCustomRulesTemplateBtn" type="button">📂 载入常用模板</button>
+                </div>
+              </div>
+
+              <!-- 动态生成的审查标准卡片列表 -->
+              <div class="custom-rules-list" id="customRulesList"></div>
+
+              <div class="crs-footer-bar">
+                <button class="apple-btn secondary crs-add-btn" id="addCustomRuleBtn" type="button">+ 新增一条审查标准</button>
+                <span class="crs-hint">支持添加多条独立审查标准，包含审查项名称与具体合规要求（多行输入）</span>
+              </div>
+            </div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="reviewPipelineStep2BackBtn">← 上一步</button>
+              <button class="apple-btn primary" id="reviewPipelineStep2NextBtn">下一步：开始风控审查并生成验收单 →</button>
+            </div>
+          </div>
+
+          <!-- Step 3: 审查验收单（强弱视觉对比呈现） -->
+          <div class="pipeline-step-body" id="reviewPipelineStep3" hidden>
+            <div class="step-instruction">
+              <div class="step-ins-row">
+                <div>
+                  <h3>第 3 步：《合规性审查与风控评级报告》（强弱视觉对比呈现）</h3>
+                  <p>由本地确定性合规排查引擎深度排查，核心问题高亮置顶，完全符合项紧凑折叠弱化：</p>
+                </div>
+                <button class="apple-btn mini" id="reviewPipelineStep3RecheckBtn">🔄 重新审查</button>
+              </div>
+            </div>
+
+            <div class="audit-sheet" id="reviewAuditSheetContainer">
+              <div class="audit-sheet-header">
+                <div class="ash-badge">合规审查存根</div>
+                <h4>《合规性审查与风控评级报告》</h4>
+                <div class="ash-meta" id="reviewAuditSheetMeta">-</div>
+              </div>
+
+              <!-- 兼容旧测试/代码隐藏桩 -->
+              <div class="audit-kpi-bar" id="reviewAuditKpiBar" style="display:none !important;" hidden></div>
+
+              <!-- 强弱视觉对比主体容器 -->
+              <div class="compliance-contrast-container" id="complianceContrastContainer">
+                <!-- 【重点不合规 / 偏离项（强视觉高亮）】排在最上方 -->
+                <div class="contrast-highlight-section" id="contrastHighlightSection">
+                  <div class="chs-header">
+                    <span class="chs-icon">⚠️</span>
+                    <b class="chs-title">重点不合规 / 偏离项（强视觉高亮 · 需重点关注与修订）</b>
+                    <span class="chs-badge" id="contrastHighlightCount">0 项</span>
+                  </div>
+                  <div class="chs-body" id="contrastHighlightBody">
+                    <!-- 动态生成高对比度深色加粗标题 + 琥珀金/深红左侧 4px 警示边条 + 浅暖色高亮底纹卡片 -->
+                  </div>
+                </div>
+
+                <!-- 【完全符合项（弱视觉弱化）】排在下方 -->
+                <div class="contrast-weak-section" id="contrastWeakSection">
+                  <div class="cws-header" id="contrastWeakToggleHead" title="点击展开/收起完全符合项">
+                    <div class="cws-title-wrap">
+                      <span class="cws-icon">✓</span>
+                      <b class="cws-title">完全符合项（符合企业风控标准）</b>
+                      <span class="cws-badge" id="contrastWeakCount">0 项</span>
+                    </div>
+                    <span class="cws-arrow" id="contrastWeakArrow">▼ 点击展开/折叠</span>
+                  </div>
+                  <div class="cws-body" id="contrastWeakBody">
+                    <!-- 动态生成浅灰底色、小一号次要字色(#86868B)紧凑展示卡片 -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- 兼容逐项对照表桩 -->
+              <div class="audit-section" id="reviewComparisonSection" style="display:none !important;" hidden>
+                <div class="as-head danger">
+                  <b>逐项审查对照表</b>
+                </div>
+                <div class="as-table-wrap" id="reviewComparisonTableWrap"></div>
+              </div>
+
+              <!-- 底部缺失条款补充清单 -->
+              <div class="audit-section" id="reviewMissingSection">
+                <div class="as-head warning">
+                  <span class="as-icon">📌</span>
+                  <b id="reviewMissingTitle">底部《缺失条款与待补充清单》（建议完善的风控兜底条款）</b>
+                </div>
+                <div class="as-table-wrap" id="reviewMissingTableWrap"></div>
+              </div>
+            </div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="reviewPipelineStep3BackBtn">← 调整审查内容</button>
+              <button class="apple-btn primary" id="reviewPipelineStep3NextBtn">下一步：一键交付审查报告 →</button>
+            </div>
+          </div>
+
+          <!-- Step 4: 一键交付 -->
+          <div class="pipeline-step-body" id="reviewPipelineStep4" hidden>
+            <div class="step-instruction">
+              <h3>第 4 步：合规审查成果交付与多场景协同流转</h3>
+              <p>合规审查已完成！您可以直接导出标准 Word 审查报告、高管汇报 PPT，或将风险项送入专项公文报告：</p>
+            </div>
+
+            <div class="delivery-grid">
+              <!-- 卡片 1: 导出 Word -->
+              <div class="delivery-card primary-card">
+                <div class="dc-icon">📄</div>
+                <div class="dc-info">
+                  <h4>导出《合规性审查报告.docx》</h4>
+                  <p>生成含强弱对比风险清单、逐项对照表与缺失条款补充清单的标准企业公文 Word 格式，支持本地直接编辑。</p>
+                </div>
+                <button class="apple-btn primary lg" id="reviewExportDocxBtn">📥 立即导出 Word 审查报告</button>
+              </div>
+
+              <!-- 卡片 2: 导出 PPT -->
+              <div class="delivery-card">
+                <div class="dc-icon">📑</div>
+                <div class="dc-info">
+                  <h4>导出《合规性审查汇报.pptx》</h4>
+                  <p>包含核心风控评级、重点不合规项分布卡片与强弱对照幻灯片，便于高管汇报与业务会签。</p>
+                </div>
+                <button class="apple-btn secondary lg" id="reviewExportPptBtn">📊 立即导出汇报 PPT</button>
+              </div>
+
+              <!-- 卡片 3: 送入写专业报告 -->
+              <div class="delivery-card">
+                <div class="dc-icon">📝</div>
+                <div class="dc-info">
+                  <h4>一键送入「写专业报告」</h4>
+                  <p>将上述审查结论与修改后标准条款带入报告引擎，出具正式的《关于采购合规风险修订建议的专项联络单》。</p>
+                </div>
+                <button class="apple-btn secondary lg" id="reviewToReportBtn">送入法务专项报告 →</button>
+              </div>
+            </div>
+
+            <div class="pipeline-export-result" id="reviewExportResult" hidden></div>
+
+            <div class="pipeline-actions">
+              <button class="apple-btn secondary" id="reviewPipelineStep4BackBtn">← 查看审查验收单</button>
+              <button class="apple-btn" id="reviewPipelineFinishBtn">完成并返回对话</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- ============ 输入区（固定在底部） ============ -->
+    <div class="composer-area input-dock chat-input-container" id="composerArea">
+      <div class="composer" id="composer">
+        <div class="chips" id="chips"></div>
+        <div class="input-row">
+          <button class="plus-btn" id="plusBtn" title="添加文件（也可以直接把文件拖到这里）">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span class="plus-badge" id="plusBadge" hidden>0</span>
+          </button>
+          <input type="file" id="fileInput" multiple hidden />
+          <textarea id="input" rows="1" placeholder="给灵梦发消息…（Enter 发送，Shift+Enter 换行）"></textarea>
+          <button class="send-btn" id="sendBtn" title="发送">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </button>
+        </div>
+        <div class="mode-row" id="modeRow"></div>
+        <div class="hint-row">
+          <div class="hint-left">
+            <button class="mini-toggle param-btn" id="paramBtn" title="切换思考强度与回答长度"><span class="param-icon">⚡</span> 思考强度：<b id="paramEcho">Medium</b></button>
+            <div class="param-pop" id="paramPop" hidden>
+              <div class="effort">
+                <div class="row"><span>思考强度</span><b id="effortName">Medium</b></div>
+                <input type="range" id="effortRange" min="0" max="3" step="1" value="1" />
+                <div class="ticks"><span>Low</span><span>Medium</span><span>High</span><span>Max</span></div>
+                <div class="desc" id="effortDesc">较快给出答案，适合日常问答与简单整理。</div>
+              </div>
+              <label class="mini legacy">
+                回答长度
+                <input type="range" id="lenRange" min="0" max="3" step="1" value="1" />
+                <span id="lenVal">约 600 字</span>
+              </label>
+              <label class="mini legacy">
+                随机性
+                <input type="range" id="temperature" min="0" max="1.2" step="0.1" value="0.7" />
+                <span id="tempVal">0.7</span>
+              </label>
+            </div>
+            <span class="report-len" id="reportLenWrap" hidden>
+              <button class="mini-toggle on" data-rlen="1536" data-rtype="short" title="约 1200 字，精炼总结与核心要点">短报告（1200字）</button>
+              <button class="mini-toggle" data-rlen="6144" data-rtype="long" title="约 3000~6000 字，按大纲分章节自动接力生成，突破模型单次上限">长报告（3000~6000字）</button>
+            </span>
+            <button class="mini-toggle on" id="codeToggle" hidden title="让模型写 pandas 代码、本地跑出结果再回答，数字更准（只对表格文件生效）">用代码计算</button>
+            <button class="mini-toggle" id="deepToggle" title="仅对思考型模型（如 Qwen3-8B）有效"><span class="deep-dot"></span>深度思考</button>
+            <button class="mini-toggle" id="summaryExportBtn" hidden title="自动执行多表对账并导出专业 Excel 汇总表">📥 导出汇总表.xlsx</button>
+            <label class="mini" id="pptPagesWrap" hidden title="PPT 页数，最多 100 页；页数越多生成越慢">
+              PPT 页数
+              <input type="number" id="pptPages" min="1" max="100" value="10" />
+            </label>
+          </div>
+          <div class="hint-right" id="hintRight">模型加载中…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="split-resizer" id="artifactResizer" title="拖动调整成果舱宽度" hidden></div>
+
+    <!-- ============ 工作台右侧成果预览舱 (Artifact Panel) ============ -->
+  <aside class="artifact-panel" id="artifactPanel" hidden>
+    <div class="ap-header">
+      <div class="ap-title-wrap">
+        <span class="ap-icon" id="apIcon">📊</span>
+        <div class="ap-meta">
+          <div class="ap-title" id="apTitle">成果预览舱</div>
+          <div class="ap-sub"><span class="ap-tag" id="apTag">Excel</span><span class="ap-size" id="apSize">0 KB</span></div>
+        </div>
+      </div>
+      <div class="ap-actions">
+        <button class="ap-act-btn primary" id="apOpenBtn" title="调用系统默认软件（Excel / WPS）直接打开">📂 本机打开</button>
+        <button class="ap-act-btn" id="apRevealBtn" title="在 Windows 资源管理器中定位">📁 打开目录</button>
+        <button class="icon-btn ap-close-btn" id="apCloseBtn" title="关闭成果预览舱">✕</button>
+      </div>
+    </div>
+
+    <div class="ap-kpi-bar" id="apKpiBar"></div>
+
+    <div class="ap-body" id="apBody">
+      <div class="ap-placeholder">
+        <div class="ap-ph-icon">📊</div>
+        <div class="ap-ph-title">暂未选择交付成果</div>
+        <div class="ap-ph-desc">在左侧执行汇总表、比价、PPT 或长报告生成，成果将在此实时渲染。</div>
+      </div>
+    </div>
+
+    <div class="ap-footer">
+      <div class="ap-path-text" id="apPath" title="本地输出完整路径">-</div>
+      <button class="ap-mini-btn" id="apCopyPathBtn" title="复制文件路径">复制路径</button>
+    </div>
+  </aside>
+</div>
+</main>
+</div>
+
+<!-- ============ 设置抽屉 ============ -->
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span>设置</span>
+    <button class="icon-btn" id="drawerClose">✕</button>
+  </div>
+  <div class="drawer-body">
+    <section>
+      <h3>运行环境</h3>
+      <div class="kv"><span>模型</span><b id="setModel">-</b></div>
+      <div class="kv"><span>设备</span><b id="setDevice">-</b></div>
+      <div class="kv"><span>状态</span><b id="setStatus">-</b></div>
+      <div class="kv"><span>内存</span><b id="setRam">-</b></div>
+      <div class="kv"><span>处理器</span><b id="setCpu">-</b></div>
+      <div class="kv"><span>显卡</span><b id="setGpu">-</b></div>
+      <p class="note">启动时按内存/显卡自动挑选最合适的模型；也可以锁定某个模型固定使用。</p>
+    </section>
+    <section>
+      <h3>生成参数</h3>
+      <div class="kv"><span>深度思考</span>
+        <label class="switch"><input type="checkbox" id="deepThink" /><i></i></label>
+      </div>
+      <p class="note" id="deepNote">仅对思考型模型生效。当前模型本身不思考，换成「思考版」后可用。</p>
+    </section>
+    <section>
+      <h3>模型</h3>
+      <div class="kv"><span>启动时锁定当前模型</span>
+        <label class="switch"><input type="checkbox" id="modelLock" /><i></i></label>
+      </div>
+      <p class="note" id="modelHint">正在识别本机配置…</p>
+      <div id="modelList" class="model-list"></div>
+      <p class="note">切换需要 1–2 分钟重新加载。思考版会先推理再回答，适合难题；快答版更快。Qwen3.5 架构当前运行时暂不支持，所以未提供。</p>
+    </section>
+    <section>
+      <h3>长期记忆</h3>
+      <p class="note">写在这里的内容，每次对话都会带上；也可以直接在对话里说「记住：……」。</p>
+      <div class="mem-input">
+        <textarea id="memInput" rows="2" placeholder="例如：我在公司做采购，报告统一按「总体情况 / 存在问题 / 下步计划」三段写"></textarea>
+        <button class="mini-btn" id="memAdd">添加记忆</button>
+      </div>
+      <div id="memList" class="mem-list"></div>
+    </section>
+    <section>
+      <h3>知识库（历史文件检索）</h3>
+      <div class="kv"><span>回答时检索以前上传的文件</span>
+        <label class="switch"><input type="checkbox" id="kbToggle" checked /><i></i></label>
+      </div>
+      <p class="note" id="kbStats">已索引 0 个片段</p>
+      <div id="kbFiles" class="kb-list"></div>
+      <div class="row-end">
+        <button class="mini-btn" id="kbRebuild">重建索引</button>
+        <button class="mini-btn" id="kbClear">清空索引</button>
+      </div>
+    </section>
+    <section>
+      <h3>当前对话的文件</h3>
+      <div id="drawerFiles" class="drawer-files"></div>
+    </section>
+    <section>
+      <h3>模式提示词 <span class="badge-pill">✨ 工业级专家提示词库</span></h3>
+      <p class="note">已预装材料TCO比价、多表对账、长短报告等专业级提示词。留空保存＝恢复默认。</p>
+      <select id="promptModeSel" class="sel"></select>
+      <textarea id="promptText" rows="6" class="prompt-area" placeholder="选择上面某个模式后，这里显示它的提示词…"></textarea>
+      <div class="row-end">
+        <button class="mini-btn danger" id="promptResetAll" title="将所有模式重置为最新专业供应链提示词">🔄 全部恢复专家库</button>
+        <button class="mini-btn" id="promptReset">恢复当前默认</button>
+        <button class="mini-btn primary" id="promptSave">保存</button>
+      </div>
+    </section>
+    <section>
+      <h3>关于</h3>
+      <div class="kv"><span>版本</span><b id="setVersion">v1.0</b></div>
+      <p class="about-tagline">寻找最优解，是灵梦的唯一直觉</p>
+      <p class="note">数据全部保存在 <code>程序目录\data</code>，生成的文件在 <code>程序目录\output</code>。关闭窗口即退出。</p>
+    </section>
+  </div>
+</aside>
+
+<div class="preview-mask" id="previewMask" hidden>
+  <div class="preview">
+    <div class="preview-head"><b id="previewName">文件</b><button class="icon-btn" id="previewClose" title="关闭">✕</button></div>
+    <pre class="preview-body" id="previewBody"></pre>
+  </div>
+</div>
+
+<!-- ============ 全局轻量 Toast 提示 ============ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============ iOS 风格毛玻璃居中 Modal 弹窗 (彻底消灭 127.0.0.1 浏览器弹窗) ============ -->
+<div class="modal-mask" id="customModalMask" hidden>
+  <div class="modal-card" id="customModalCard">
+    <div class="modal-icon" id="modalIcon">💬</div>
+    <div class="modal-title" id="modalTitle">提示</div>
+    <div class="modal-body" id="modalBody">内容</div>
+    <div class="modal-foot" id="modalFoot">
+      <button class="modal-btn cancel" id="modalCancelBtn">取消</button>
+      <button class="modal-btn confirm primary" id="modalConfirmBtn">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 模型加载动态进度遮罩层 (呼吸动画 + 实时读秒) ============ -->
+<div class="model-loading-mask" id="modelLoadingMask" hidden>
+  <div class="model-loading-card">
+    <div class="model-pulse-ring">
+      <div class="pulse-circle"></div>
+      <div class="pulse-icon"><svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M16 3L19 13L29 16L19 19L16 29L13 19L3 16L13 13Z" fill="#E7C27D"/></svg></div>
+    </div>
+    <div class="model-loading-title" id="modelLoadingTitle">正在将模型加载至本机核显...</div>
+    <div class="model-loading-sub" id="modelLoadingSub">正在分配显存与载入权重，通常需 20–60 秒</div>
+    <div class="model-loading-progress-wrap">
+      <div class="model-loading-bar-indeterminate"></div>
+    </div>
+    <div class="model-loading-timer">
+      <span class="timer-dot"></span> 已用时：<b id="modelLoadingTimer">0s</b>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js?v=20261105c"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+# ==============================================================================
+# 灵梦工作台 (Lingmeng Workbench) .gitignore
+# 严禁提交任何用户私人数据、本地数据库、模型权重与生成文档
+# ==============================================================================
+
+# 1. 本机用户数据、历史记录与个人数据库 (STRICTLY PRIVATE)
+data/*
+!data/.gitkeep
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.lock
+*.hwnd
+*.log
+
+# 2. 用户生成的交付成果与业务文件 (STRICTLY PRIVATE)
+output/*
+!output/.gitkeep
+*.xlsx
+*.docx
+*.pptx
+# 保留 tests/mock_data 中的合成测试用例
+!tests/mock_data/*.xlsx
+!tests/mock_data/*.docx
+!tests/mock_data/*.json
+
+# 3. 大模型权重文件 (BINARY WEIGHTS - 严禁推送到 GitHub)
+models/*
+!models/.gitkeep
+*.gguf
+*.bin
+*.safetensors
+*.onnx
+*.pt
+*.pth
+
+# 4. 嵌入式 Python 运行时与虚拟环境
+runtime/
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# 5. 临时开发备份、测试产生物与测试截屏
+*.bak
+*.backup
+*.bento_bak
+*.pre_fix_backup
+*.v1_*
+*.png
+!灵梦-v6.ico
+edge_debug_profile*/
+edge_test_prof*/
+.agents/
+.system_generated/
+scratch/
+
+# 6. Python 缓存与系统临时文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 7. IDE 与操作系统生成文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini

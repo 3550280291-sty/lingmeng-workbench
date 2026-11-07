@@ -1,0 +1,33 @@
+# 灵梦工作台 (Lingmeng Workbench) 依赖清单
+# 运行环境推荐: Python 3.10 / 3.11 / 3.12 (64-bit)
+
+# 核心 Web 与异步服务
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+starlette>=0.36.0
+python-multipart>=0.0.9
+pydantic>=2.6.0
+requests>=2.31.0
+
+# Office 文档与数据处理引擎
+pandas>=2.2.0
+openpyxl>=3.1.2
+python-docx>=1.1.0
+python-pptx>=0.6.23
+pymupdf>=1.24.0
+pypdf>=4.0.0
+xlsxwriter>=3.2.0
+
+# 桌面集成与系统进程管理
+pywebview>=5.0.0
+psutil>=5.9.0
+
+# 文本解析与渲染辅助
+jinja2>=3.1.3
+jieba>=0.42.1
+orjson>=3.9.0
+
+# 本地大模型离线推理与加速 (可选，使用本地 GGUF/OpenVINO 时需要)
+# gguf>=0.19.0
+# openvino>=2024.4.0
+# openvino-genai>=2024.4.0
