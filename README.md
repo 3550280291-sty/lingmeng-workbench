@@ -46,7 +46,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/YOUR_USERNAME/lingmeng-workbench.git
+git clone https://github.com/3550280291-sty/lingmeng-workbench.git
 cd lingmeng-workbench
 
 # 创建并激活虚拟环境 (推荐)
